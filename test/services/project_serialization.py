@@ -3,6 +3,7 @@ Test /app/services/project_serialization.py
 """
 
 import os
+import yaml
 import shutil
 import unittest
 
@@ -41,7 +42,7 @@ class MyTestCase(unittest.TestCase):
     def test_get_supported_languages(self) -> None:
         """Test get_supported_languages"""
         self.assertEqual(
-            tuple("Python"), ProjectSerializor.get_supported_langauges()
+            tuple(["Python"]), ProjectSerializor.get_supported_langauges()
         )
 
     def test_serialize_deserialize(self) -> None:
@@ -49,16 +50,68 @@ class MyTestCase(unittest.TestCase):
 
         # Success
         ProjectSerializor.create_configuration_folder(self.__folder)
-        attributes = {"language": "Python", "Framework": "Flask"}
+        attributes = {"language": "Python", "framework": "Flask"}
         ProjectSerializor.serialize(self.__folder, attributes)
         deserialized = ProjectSerializor.deserialize(self.__folder)
         self.assertEqual(attributes, deserialized)
 
-        # Fail
+        # Fail (test atrribute validation)
         with self.assertRaises(NotADirectoryError):
             ProjectSerializor.serialize(self.__folder + "a", attributes)
+        attributes["language"] = "JavaScript"
+        with self.assertRaises(ValueError):
+            ProjectSerializor.serialize(self.__folder, attributes)
+        attributes.pop("language")
+        with self.assertRaises(KeyError):
+            ProjectSerializor.serialize(self.__folder, attributes)
+
         with self.assertRaises(FileNotFoundError):
             ProjectSerializor.deserialize(self.__folder + "a")
+        with open(
+            os.path.join(self.__folder, ".hlzcs/project_attributes.yaml"),
+            "w",
+            encoding="utf-8",
+        ) as file:
+            yaml.dump({"framework": "Flask"}, file)
+        with self.assertRaises(KeyError):
+            ProjectSerializor.deserialize(self.__folder)
+        with open(
+            os.path.join(self.__folder, ".hlzcs/project_attributes.yaml"),
+            "w",
+            encoding="utf-8",
+        ) as file:
+            yaml.dump({"language": "JavaScript"}, file)
+        with self.assertRaises(ValueError):
+            ProjectSerializor.deserialize(self.__folder)
+
+    def test_create_project(self) -> None:
+        """Test create_project."""
+
+        # Success
+        data = {"path": self.__folder, "language": "Python"}
+        ProjectSerializor.create_project(data)
+        self.assertEqual(
+            "Python", ProjectSerializor.deserialize(self.__folder)["language"]
+        )
+
+        # Fail
+
+        data["path"] = self.__folder + "A"
+        with self.assertRaises(NotADirectoryError):
+            ProjectSerializor.create_project(data)
+
+        data.pop("path")
+        with self.assertRaises(KeyError):
+            ProjectSerializor.create_project(data)
+
+        data["path"] = self.__folder
+        data["language"] = "JavaScript"
+        with self.assertRaises(ValueError):
+            ProjectSerializor.create_project(data)
+
+        data.pop("language")
+        with self.assertRaises(KeyError):
+            ProjectSerializor.create_project(data)
 
 
 if __name__ == "__main__":

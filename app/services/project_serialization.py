@@ -14,8 +14,8 @@ class ProjectSerializor:
     """Serialize and deserialize project information."""
 
     __CONFIGURATION_FOLDER_NAME = ".hlzcs"
-    __PROJECT_ATTRIBUTE_FILE_NAME = "project_attribute.yaml"
-    __SUPPORTED_LANGUAGE = tuple("Python")
+    __PROJECT_ATTRIBUTE_FILE_NAME = "project_attributes.yaml"
+    __SUPPORTED_LANGUAGE = tuple(["Python"])
 
     @classmethod
     def is_initialized(cls, path: str) -> bool:
@@ -66,7 +66,7 @@ class ProjectSerializor:
         return cls.__SUPPORTED_LANGUAGE
 
     @classmethod
-    def serialize(cls, path: str, project_attributes: dict[str, str]) -> None:
+    def serialize(cls, path: str, attributes: dict[str, str]) -> None:
         """Serialize the project attributes to a yaml file.
 
         Args:
@@ -74,6 +74,8 @@ class ProjectSerializor:
             project_attributes (dict[str, str]): Dictionary of project attributes.
         Raises:
             NotADirectoryError: When the path doesn' exist.
+            KeyError: When missing any field.
+            ValueError: When language isn't supported.
         """
 
         # Check path.
@@ -81,7 +83,8 @@ class ProjectSerializor:
         if not os.path.isdir(folder_path):
             raise_not_a_directory(folder_path)
 
-        # TODO Validate configurations.
+        # Validate attributes.
+        cls.validate_attributes(attributes)
 
         # Dump to yaml.
         with open(
@@ -89,7 +92,7 @@ class ProjectSerializor:
             "w",
             encoding="utf-8",
         ) as file:
-            yaml.dump(project_attributes, file)
+            yaml.dump(attributes, file)
 
     @classmethod
     def deserialize(cls, path: str) -> dict[str, str]:
@@ -102,6 +105,8 @@ class ProjectSerializor:
             dict[str, str]: Project attributes.
         Raises:
             FileNotFoundError: When the attribute file doesn't exist.
+            KeyError: When missing any field.
+            ValueError: When language isn't supported.
         """
 
         # Check path.
@@ -119,9 +124,61 @@ class ProjectSerializor:
         with open(file_path, "r", encoding="utf=8") as file:
             attributes = yaml.safe_load(file)
 
-        # TODO Validate attributes.
+        # Validate attributes.
+        cls.validate_attributes(attributes)
 
         return attributes
+
+    @classmethod
+    def validate_attributes(cls, attributes: dict[str, str]) -> None:
+        """Validate project attributes.
+
+        Args:
+            attributes (dict[str, str]): Project attributes
+
+        Raises:
+            KeyError: When missing any field.
+            ValueError: When language isn't supported.
+        """
+
+        keys = ["language"]
+        for key in keys:
+            if key not in attributes:
+                error = f'Missing field "{key}".'
+                logging.error(error)
+                raise KeyError(error)
+
+        # Validate language.
+        language = attributes["language"]
+        if language not in cls.__SUPPORTED_LANGUAGE:
+            error = f"Language {language} is not supported."
+            logging.error(error)
+            raise ValueError(error)
+
+    @classmethod
+    def create_project(cls, data: dict[str, str]) -> None:
+        """Create a configuration and serialize project attributes.
+
+        Args:
+            data (dict[str, str]): Data from the request.
+
+        Raises:
+            KeyError: When missing any field.
+            NotADirectoryError: When the path doesn't exist.
+            ValueError: When language isn't supported.
+        """
+
+        # Get attributes.
+        if "path" not in data:
+            error = 'Missing field "path".'
+            logging.error(error)
+            raise KeyError(error)
+
+        path = data["path"]
+        cls.create_configuration_folder(path)
+        attributes = data.copy()
+        attributes.pop("path")
+        cls.serialize(path, attributes)
 
 
 def raise_not_a_directory(path: str) -> None:
