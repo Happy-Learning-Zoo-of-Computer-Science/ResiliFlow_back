@@ -9,13 +9,14 @@ import logging
 
 import yaml
 
+from app.services.configurators.factory import ConfiguratorFactory
+
 
 class ProjectSerializor:
     """Serialize and deserialize project information."""
 
     __CONFIGURATION_FOLDER_NAME = ".hlzcs"
     __PROJECT_ATTRIBUTE_FILE_NAME = "project_attributes.yaml"
-    __SUPPORTED_LANGUAGE = tuple(["Python"])
 
     @classmethod
     def is_initialized(cls, path: str) -> bool:
@@ -63,7 +64,54 @@ class ProjectSerializor:
         Returns:
             tuple[str]: A tuple of suppoerted languages.
         """
-        return cls.__SUPPORTED_LANGUAGE
+        return ConfiguratorFactory.get_supported_languages()
+
+    @classmethod
+    def get_supported_frameworks(cls, language: str) -> tuple[str]:
+        """Get a tuple of templates of a language supported by our application.
+
+        Args:
+            language (str): A programming language.
+
+        Returns:
+            tuple[str]: A tuple of supported frameworks.
+        """
+        return ConfiguratorFactory.get_supported_frameworks(language)
+
+    @classmethod
+    def get_configurations(
+        cls, language: str, framework: str = None
+    ) -> dict[str, any]:
+        """Get supported configuration methods and attributes of those method.
+
+        Args:
+            language (str): A programming language.
+            framework (str): A programming language framework.
+        Returns:
+            dict[str, any]: Json of supported configuration methods and attributes of those method.
+        """
+        return ConfiguratorFactory.get_configurations(language, framework)
+
+    @classmethod
+    def get_initialized_configurations(
+        cls, path: str, language: str, framework: str = None
+    ) -> list[str]:
+        """Get a list of configuration files which this project has initialized.
+
+        Args:
+            path (str): Path of the project.
+            language: A coding language.
+            framework: A coding language framework.
+
+        Raises:
+            NotADirectoryError: When path does not exist.
+
+        Returns:
+            list[str]: A list of configuration files which this project has initialized.
+        """
+        return ConfiguratorFactory.get_initialized_configurations(
+            path, language, framework
+        )
 
     @classmethod
     def serialize(cls, path: str, attributes: dict[str, str]) -> None:
@@ -71,7 +119,7 @@ class ProjectSerializor:
 
         Args:
             path (str): Path of the project folder.
-            project_attributes (dict[str, str]): Dictionary of project attributes.
+            attributes (dict[str, str]): Dictionary of project attributes.
         Raises:
             NotADirectoryError: When the path doesn' exist.
             KeyError: When missing any field.
@@ -82,9 +130,6 @@ class ProjectSerializor:
         folder_path = os.path.join(path, cls.__CONFIGURATION_FOLDER_NAME)
         if not os.path.isdir(folder_path):
             raise_not_a_directory(folder_path)
-
-        # Validate attributes.
-        cls.validate_attributes(attributes)
 
         # Dump to yaml.
         with open(
@@ -125,35 +170,10 @@ class ProjectSerializor:
             attributes = yaml.safe_load(file)
 
         # Validate attributes.
-        cls.validate_attributes(attributes)
+        attributes["path"] = path
+        ConfiguratorFactory.get_configurator(attributes)
 
         return attributes
-
-    @classmethod
-    def validate_attributes(cls, attributes: dict[str, str]) -> None:
-        """Validate project attributes.
-
-        Args:
-            attributes (dict[str, str]): Project attributes
-
-        Raises:
-            KeyError: When missing any field.
-            ValueError: When language isn't supported.
-        """
-
-        keys = ["language"]
-        for key in keys:
-            if key not in attributes:
-                error = f'Missing field "{key}".'
-                logging.error(error)
-                raise KeyError(error)
-
-        # Validate language.
-        language = attributes["language"]
-        if language not in cls.__SUPPORTED_LANGUAGE:
-            error = f"Language {language} is not supported."
-            logging.error(error)
-            raise ValueError(error)
 
     @classmethod
     def create_project(cls, data: dict[str, str]) -> None:
@@ -176,9 +196,9 @@ class ProjectSerializor:
 
         path = data["path"]
         cls.create_configuration_folder(path)
-        attributes = data.copy()
-        attributes.pop("path")
-        cls.serialize(path, attributes)
+        configurator = ConfiguratorFactory.get_configurator(data)
+        configurator.build_configurations()
+        cls.serialize(path, configurator.get_serialize_data())
 
 
 def raise_not_a_directory(path: str) -> None:

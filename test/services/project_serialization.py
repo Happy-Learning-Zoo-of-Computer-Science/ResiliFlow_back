@@ -50,31 +50,28 @@ class MyTestCase(unittest.TestCase):
 
         # Success
         ProjectSerializor.create_configuration_folder(self.__folder)
-        attributes = {"language": "Python", "framework": "Flask"}
+        attributes = {"path": self.__folder, "language": "Python"}
         ProjectSerializor.serialize(self.__folder, attributes)
         deserialized = ProjectSerializor.deserialize(self.__folder)
         self.assertEqual(attributes, deserialized)
 
-        # Fail (test atrribute validation)
+        # Fail
         with self.assertRaises(NotADirectoryError):
             ProjectSerializor.serialize(self.__folder + "a", attributes)
-        attributes["language"] = "JavaScript"
-        with self.assertRaises(ValueError):
-            ProjectSerializor.serialize(self.__folder, attributes)
-        attributes.pop("language")
-        with self.assertRaises(KeyError):
-            ProjectSerializor.serialize(self.__folder, attributes)
 
         with self.assertRaises(FileNotFoundError):
             ProjectSerializor.deserialize(self.__folder + "a")
+
         with open(
             os.path.join(self.__folder, ".hlzcs/project_attributes.yaml"),
             "w",
             encoding="utf-8",
         ) as file:
             yaml.dump({"framework": "Flask"}, file)
+
         with self.assertRaises(KeyError):
             ProjectSerializor.deserialize(self.__folder)
+
         with open(
             os.path.join(self.__folder, ".hlzcs/project_attributes.yaml"),
             "w",
@@ -96,6 +93,11 @@ class MyTestCase(unittest.TestCase):
 
         # Fail
 
+        data["framework"] = "Flask"
+        with self.assertRaises(ValueError):
+            ProjectSerializor.create_project(data)
+
+        data.pop("framework")
         data["path"] = self.__folder + "A"
         with self.assertRaises(NotADirectoryError):
             ProjectSerializor.create_project(data)
