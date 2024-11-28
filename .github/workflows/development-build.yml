@@ -1,7 +1,10 @@
 name: Build Python Development Executables
 
 on:
-    push
+    push:
+        paths:
+            - '**.py'
+            - 'requirements.txt'
 
 jobs:
     build-windows:
@@ -25,7 +28,7 @@ jobs:
               run: pyinstaller --onefile run.py
 
             - name: Upload Windows artifact
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: python-windows-executable
                 path: dist/run.exe
@@ -51,7 +54,7 @@ jobs:
               run: pyinstaller --onefile run.py
 
             - name: Upload Windows artifact
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: python-macos-executable
                 path: dist/run
@@ -77,7 +80,7 @@ jobs:
               run: pyinstaller --onefile run.py
 
             - name: Upload Windows artifact
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: python-linux-executable
                 path: dist/run
