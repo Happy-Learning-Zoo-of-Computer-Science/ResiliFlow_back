@@ -121,6 +121,3 @@ def create_project() -> Response:
         return "", 200
     except (KeyError, ValueError, NotADirectoryError) as ex:
         return jsonify({"error": ex.args[0]}), 400
-    except Exception:
-        logging.error("Unhandled exception: %s", traceback.format_exc())
-        return jsonify({"error": "Unknown error."}), 500
