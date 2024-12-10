@@ -31,15 +31,15 @@ class MyTestCase(unittest.TestCase):
     def test_get_support_frameworks(self) -> None:
         """Test GET /api/project/frameworks"""
 
-        api = f"/api/project/frameworks?language=Python"
+        api = "/api/project/frameworks?language=Python"
         response = self.client.get(api)
         self.assertEqual(0, len(response.get_json()))
 
-        api = f"/api/project/frameworks?language=JavaScript"
+        api = "/api/project/frameworks?language=JavaScript"
         response = self.client.get(api)
         self.assertEqual(0, len(response.get_json()))
 
-        api = f"/api/project/frameworks"
+        api = "/api/project/frameworks"
         response = self.client.get(api)
         self.assertEqual(400, response.status_code)
 
@@ -84,12 +84,12 @@ class MyTestCase(unittest.TestCase):
             response.get_json()["error"],
         )
 
-        api = f"/api/project/configurations/initialized?language=Python"
+        api = "/api/project/configurations/initialized?language=Python"
         response = self.client.get(api)
         self.assertEqual(400, response.status_code)
         self.assertEqual('Missing field "path".', response.get_json()["error"])
 
-        api = f"/api/project/configurations/initialized"
+        api = "/api/project/configurations/initialized"
         response = self.client.get(api)
         self.assertEqual(400, response.status_code)
         self.assertEqual(
@@ -115,7 +115,7 @@ class MyTestCase(unittest.TestCase):
         self.assertTrue(response.get_json()["valid"])
 
         # Fail
-        api = f"/api/project/validate"
+        api = "/api/project/validate"
         response = self.client.get(api)
         self.assertEqual(400, response.status_code)
 
