@@ -30,93 +30,93 @@ class MyTestCase(unittest.TestCase):
 
     def test_get_support_frameworks(self) -> None:
         """Test GET /api/project/frameworks"""
-        
-        api = "/api/project/frameworks"
-        payload = {"language": "Python"}
-        response = self.client.get(api, json=payload)
-        self.assertEqual(0, len(response.get_json()))
 
-        payload["language"] = "JavaScript"
-        response = self.client.get(api, json=payload)
-        self.assertEqual(0, len(response.get_json()))
-
-        payload.pop("language")
-        response = self.client.get(api, json=payload)
-        self.assertEqual(400, response.status_code)
-
+        api = f"/api/project/frameworks?language=Python"
         response = self.client.get(api)
-        self.assertEqual(415, response.status_code)
+        self.assertEqual(0, len(response.get_json()))
+
+        api = f"/api/project/frameworks?language=JavaScript"
+        response = self.client.get(api)
+        self.assertEqual(0, len(response.get_json()))
+
+        api = f"/api/project/frameworks"
+        response = self.client.get(api)
+        self.assertEqual(400, response.status_code)
 
     def test_get_supported_configurations(self) -> None:
         """Test GET /api/project/configurations/supported"""
 
-        api = "/api/project/configurations/supported"
-        
-        payload = {"language": "Python"}
-        response = self.client.get(api, json=payload)
+        api = "/api/project/configurations/supported?language=Python"
+        response = self.client.get(api)
         self.assertEqual(1, len(response.get_json()))
         self.assertEqual({".gitignore": None}, response.get_json())
 
-        payload["language"] = "JavaScript"
-        response = self.client.get(api, json=payload)
+        api = "/api/project/configurations/supported?language=JavaScript"
+        response = self.client.get(api)
         self.assertEqual(0, len(response.get_json()))
 
-        payload.pop("language")
-        response = self.client.get(api, json=payload)
-        self.assertEqual(400, response.status_code)
-
+        api = "/api/project/configurations/supported"
         response = self.client.get(api)
-        self.assertEqual(415, response.status_code)
+        self.assertEqual(400, response.status_code)
 
     def test_get_initialized_configuration(self) -> None:
         """Test GET /api/project/configurations/initialized"""
 
-        api = "/api/project/configurations/initialized"
-        
-        payload = {"language": "Python", "path": self.__folder}
-        response = self.client.get(api, json=payload)
+        api = f"/api/project/configurations/initialized?language=Python&path={self.__folder}"
+        response = self.client.get(api)
         self.assertEqual(0, len(response.get_json()))
 
-        payload[".gitignore"] = None
+        payload = {
+            ".gitignore": None,
+            "path": self.__folder,
+            "language": "Python",
+        }
         self.client.post("/api/project/create", json=payload)
-        response = self.client.get(api, json=payload)
+        response = self.client.get(api)
         self.assertEqual(1, len(response.get_json()))
         self.assertIn(".gitignore", response.get_json())
 
-        payload["path"] = payload["path"] + "a"
-        response = self.client.get(api, json=payload)
+        api = f"/api/project/configurations/initialized?language=Python&path={self.__folder}a"
+        response = self.client.get(api)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(f'Path "{payload["path"]}" does not exist.', response.get_json()["error"])
+        self.assertEqual(
+            f'Path "{payload["path"]}a" does not exist.',
+            response.get_json()["error"],
+        )
 
-        payload.pop("path")
-        response = self.client.get(api, json=payload)
+        api = f"/api/project/configurations/initialized?language=Python"
+        response = self.client.get(api)
         self.assertEqual(400, response.status_code)
         self.assertEqual('Missing field "path".', response.get_json()["error"])
 
-        payload.pop("language")
-        response = self.client.get(api, json=payload)
+        api = f"/api/project/configurations/initialized"
+        response = self.client.get(api)
         self.assertEqual(400, response.status_code)
-        self.assertEqual('Missing field "language".', response.get_json()["error"])
+        self.assertEqual(
+            'Missing field "language".', response.get_json()["error"]
+        )
 
     def test_is_project_initialized(self) -> None:
         """Test GET /api/project/validate"""
 
-        api = "/api/project/validate"
+        api = f"/api/project/validate?path={self.__folder}"
         # Success
-        payload = {"path": os.path.join(os.curdir, self.__folder)}
-        response = self.client.get(api, json=payload)
+        response = self.client.get(api)
         self.assertEqual(200, response.status_code)
         self.assertFalse(response.get_json()["valid"])
 
-        payload["language"] = "Python"
+        payload = {
+            "path": os.path.join(os.curdir, self.__folder),
+            "language": "Python",
+        }
         self.client.post("/api/project/create", json=payload)
-        response = self.client.get(api, json=payload)
+        response = self.client.get(api)
         self.assertEqual(200, response.status_code)
         self.assertTrue(response.get_json()["valid"])
 
         # Fail
-        payload.pop("path")
-        response = self.client.get(api, json=payload)
+        api = f"/api/project/validate"
+        response = self.client.get(api)
         self.assertEqual(400, response.status_code)
 
     def test_create_project(self) -> None:

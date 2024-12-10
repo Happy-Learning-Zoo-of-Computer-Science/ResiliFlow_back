@@ -28,12 +28,12 @@ def get_supported_frameworks() -> Response:
         Response: [frameworks].
     """
 
-    payload = request.get_json()
-    if "language" not in payload:
+    language = request.args.get("language")
+    if language is None:
         error = 'Missing field "language".'
         logging.error(error)
         return jsonify({"error": error}), 400
-    result = ProjectSerializor.get_supported_frameworks(payload["language"])
+    result = ProjectSerializor.get_supported_frameworks(language)
     return jsonify(result)
 
 
@@ -45,14 +45,13 @@ def get_supported_configurations() -> Response:
         Response: {configuration: attributes}, 400 (Missing field), 415 (No payload)
     """
 
-    payload = request.get_json()
-    if "language" not in payload:
+    language = request.args.get("language")
+    if language is None:
         error = 'Missing field "language".'
         logging.error(error)
         return jsonify({"error": error}), 400
 
-    language = payload["language"]
-    framework = payload.get("framework", None)
+    framework = request.args.get("framework", None)
     result = ProjectSerializor.get_configurations(language, framework)
     return jsonify(result)
 
@@ -65,19 +64,20 @@ def get_initialized_configurations() -> Response:
         Response: [configuration files name], 400 (Missing field, path doesn't exist), 415 (No payload)
     """
 
-    payload = request.get_json()
-    if "language" not in payload:
+    path = request.args.get("path")
+    language = request.args.get("language")
+    if language is None:
         error = 'Missing field "language".'
         logging.error(error)
         return jsonify({"error": error}), 400
-    if "path" not in payload:
+    if path is None:
         error = 'Missing field "path".'
         logging.error(error)
         return jsonify({"error": error}), 400
 
-    path = payload["path"]
-    language = payload["language"]
-    framework = payload.get("framework", None)
+
+    framework = request.args.get("framework", None)
+
     try:
         result = ProjectSerializor.get_initialized_configurations(
             path, language, framework
@@ -95,14 +95,17 @@ def is_project_initialized() -> Response:
         Response: {"valid": T | F}, 400 (Missing field), 415 (No payload)
     """
 
+    path = request.args.get("path")
+    if path is None:
+        error = 'Missing field "path".'
+        logging.error(error)
+        return jsonify({"error": error}), 400
+
     try:
-        payload = request.get_json()
-        result = ProjectSerializor.is_initialized(payload["path"])
+        result = ProjectSerializor.is_initialized(path)
         return jsonify({"valid": result})
     except NotADirectoryError:
         return jsonify({"error": "Path doesn't exist."}), 400
-    except KeyError:
-        return jsonify({"error": 'Missing field "path".'}), 400
 
 
 @bp.route("/create", methods=["POST"])
