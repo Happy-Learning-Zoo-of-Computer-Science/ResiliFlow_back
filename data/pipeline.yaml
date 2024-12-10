@@ -1,0 +1,22 @@
+- action: setup_environment
+  id: setup_node
+  inputPort: []
+  outputPort:
+  - python_env
+  x: 0
+  y: 0
+- action: install_dependencies
+  id: install_node
+  inputPort:
+  - python_env
+  outputPort:
+  - dependencies_installed
+  x: 1
+  y: 0
+- action: pyTest
+  id: pytest_node
+  inputPort:
+  - dependencies_installed
+  outputPort: []
+  x: 2
+  y: 0
