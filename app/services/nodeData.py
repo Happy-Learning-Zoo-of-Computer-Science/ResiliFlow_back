@@ -3,7 +3,7 @@
 
 import yaml
 import os
-from pipelineDesign import Node,Position
+from app.services.pipelineDesign import Node,Position
 
 file_path = "/Users/hsiangjou/Desktop/PBL G5/project/Data/pipeline.yaml"
 

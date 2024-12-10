@@ -1,6 +1,6 @@
 """create node and store created nodes into a []"""
 
-from pipelineDesign import Node, Position,setup_environment,install_dependencies,pyTest
+from app.services.pipelineDesign import Node, Position,setup_environment,install_dependencies,pyTest
 
 def createNodes():
     setupNode=Node("setup_node",Position(0,0),setup_environment)
