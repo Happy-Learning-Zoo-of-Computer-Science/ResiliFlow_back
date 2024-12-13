@@ -48,8 +48,8 @@ class MyTestCase(unittest.TestCase):
 
         api = "/api/project/configurations/supported?language=Python"
         response = self.client.get(api)
-        self.assertEqual(1, len(response.get_json()))
-        self.assertEqual({".gitignore": None}, response.get_json())
+        self.assertEqual(2, len(response.get_json()))
+        self.assertEqual({".gitignore": None, ".env": None}, response.get_json())
 
         api = "/api/project/configurations/supported?language=JavaScript"
         response = self.client.get(api)
@@ -68,13 +68,15 @@ class MyTestCase(unittest.TestCase):
 
         payload = {
             ".gitignore": None,
+            ".env": None,
             "path": self.__folder,
             "language": "Python",
         }
         self.client.post("/api/project/create", json=payload)
         response = self.client.get(api)
-        self.assertEqual(1, len(response.get_json()))
+        self.assertEqual(2, len(response.get_json()))
         self.assertIn(".gitignore", response.get_json())
+        self.assertIn(".env", response.get_json())
 
         api = f"/api/project/configurations/initialized?language=Python&path={self.__folder}a"
         response = self.client.get(api)

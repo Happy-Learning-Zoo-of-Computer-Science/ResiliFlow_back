@@ -3,9 +3,10 @@ Test /app/services/project_serialization.py
 """
 
 import os
-import yaml
 import shutil
 import unittest
+
+import yaml
 
 from app.services.project_serialization import ProjectSerializor
 

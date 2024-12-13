@@ -11,14 +11,14 @@ from app.services.configurators.python_configurator import PythonConfigurator
 class MyTestCase(unittest.TestCase):
     """Test"""
 
-    def setUp(self):
+    def setUp(self) -> None:
         # Create a folder.
         self.__folder = "test_folder"
         os.mkdir(self.__folder)
         self.__folder = os.path.join(os.path.curdir, self.__folder)
         self.__attributes = {"path": self.__folder, "language": "Python"}
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         shutil.rmtree(self.__folder)
 
     def test_get_configurator(self) -> None:

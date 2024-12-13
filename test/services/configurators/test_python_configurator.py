@@ -83,13 +83,16 @@ class MyTestCase(unittest.TestCase):
         self.assertFalse(
             os.path.isfile(os.path.join(self.__folder, ".gitignore"))
         )
+        self.assertFalse(os.path.isfile(os.path.join(self.__folder, ".env")))
 
         self.__attributes[".gitignore"] = None
+        self.__attributes[".env"] = None
         self.__configurator = PythonConfigurator(self.__attributes)
         self.__configurator.build_configurations()
         self.assertTrue(
             os.path.isfile(os.path.join(self.__folder, ".gitignore"))
         )
+        self.assertTrue(os.path.isfile(os.path.join(self.__folder, ".env")))
 
 
 if __name__ == "__main__":

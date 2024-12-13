@@ -29,7 +29,7 @@ class MyTestCase(unittest.TestCase):
         # Delete the folder.
         shutil.rmtree(self.__folder)
 
-    def test＿constructor(self) -> None:
+    def test_constructor(self) -> None:
         """Test constructor."""
 
         # Incorrect path.
@@ -79,6 +79,12 @@ class MyTestCase(unittest.TestCase):
             ".DS_Store\nenv/\n.env\n.vscode",
             self.__configurator._get_general_gitignore(),
         )
+
+    def test_build_env(self) -> None:
+        """Test build_env()"""
+
+        self.__configurator._build_env()
+        self.assertTrue(os.path.isfile(os.path.join(self.__folder, ".env")))
 
 
 if __name__ == "__main__":

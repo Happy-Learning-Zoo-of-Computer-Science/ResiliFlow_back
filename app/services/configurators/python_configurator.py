@@ -116,7 +116,7 @@ class PythonConfigurator(Configurator):
     def build_configurations(self) -> None:
         """Build configurations for the project in local storage."""
 
-        call = {".gitignore": self._build_gitignore}
+        call = {".gitignore": self._build_gitignore, ".env": self._build_env}
         for key, value in self._attributes.items():
             if key not in call:
                 continue
