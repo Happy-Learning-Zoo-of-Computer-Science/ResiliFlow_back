@@ -25,7 +25,7 @@ jobs:
                 pip install pyinstaller
 
             - name: Build executable
-              run: pyinstaller --onefile --add-data "/app/services/configurators/templates:templates" run.py
+              run: pyinstaller --onefile --add-data "app/services/configurators/templates:templates" run.py
 
             - name: Upload Windows artifact
               uses: actions/upload-artifact@v4
@@ -51,7 +51,7 @@ jobs:
                 pip install pyinstaller
 
             - name: Build executable
-              run: pyinstaller --onefile --add-data "/app/services/configurators/templates:templates" run.py
+              run: pyinstaller --onefile --add-data "app/services/configurators/templates:templates" run.py
 
             - name: Upload Windows artifact
               uses: actions/upload-artifact@v4
@@ -77,7 +77,7 @@ jobs:
                 pip install pyinstaller
 
             - name: Build executable
-              run: pyinstaller --onefile --add-data "/app/services/configurators/templates:templates" run.py
+              run: pyinstaller --onefile --add-data "app/services/configurators/templates:templates" run.py
 
             - name: Upload Windows artifact
               uses: actions/upload-artifact@v4
