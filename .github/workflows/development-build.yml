@@ -5,6 +5,7 @@ on:
         paths:
             - '**.py'
             - 'requirements.txt'
+            - '.github/workflows/development-build.yml'
 
 jobs:
     build-windows:
