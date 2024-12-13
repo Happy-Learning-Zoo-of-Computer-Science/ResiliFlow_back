@@ -33,7 +33,8 @@ class MyTestCase(unittest.TestCase):
 
         api = "/api/project/frameworks?language=Python"
         response = self.client.get(api)
-        self.assertEqual(0, len(response.get_json()))
+        self.assertEqual(1, len(response.get_json()))
+        self.assertEqual(["Flask"], response.get_json())
 
         api = "/api/project/frameworks?language=JavaScript"
         response = self.client.get(api)
@@ -51,6 +52,11 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(2, len(response.get_json()))
         self.assertEqual({".gitignore": None, ".env": None}, response.get_json())
 
+        api = "/api/project/configurations/supported?language=Python&framework=Flask"
+        response = self.client.get(api)
+        self.assertEqual(3, len(response.get_json()))
+        self.assertEqual({".gitignore": None, ".env": None, "starter code": None}, response.get_json())
+
         api = "/api/project/configurations/supported?language=JavaScript"
         response = self.client.get(api)
         self.assertEqual(0, len(response.get_json()))
@@ -62,21 +68,24 @@ class MyTestCase(unittest.TestCase):
     def test_get_initialized_configuration(self) -> None:
         """Test GET /api/project/configurations/initialized"""
 
-        api = f"/api/project/configurations/initialized?language=Python&path={self.__folder}"
+        api = f"/api/project/configurations/initialized?language=Python&framework=Flask&path={self.__folder}"
         response = self.client.get(api)
         self.assertEqual(0, len(response.get_json()))
 
         payload = {
             ".gitignore": None,
             ".env": None,
+            "starter code": None,
             "path": self.__folder,
             "language": "Python",
+            "framework": "Flask",
         }
         self.client.post("/api/project/create", json=payload)
         response = self.client.get(api)
-        self.assertEqual(2, len(response.get_json()))
+        self.assertEqual(3, len(response.get_json()))
         self.assertIn(".gitignore", response.get_json())
         self.assertIn(".env", response.get_json())
+        self.assertIn("starter code", response.get_json())
 
         api = f"/api/project/configurations/initialized?language=Python&path={self.__folder}a"
         response = self.client.get(api)
@@ -130,6 +139,19 @@ class MyTestCase(unittest.TestCase):
         payload = {
             "path": os.path.join(os.curdir, self.__folder),
             "language": "Python",
+        }
+        response = self.client.post(api, json=payload)
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(
+            os.path.isfile(
+                os.path.join(self.__folder, ".hlzcs/project_attributes.yaml")
+            )
+        )
+
+        payload = {
+            "path": os.path.join(os.curdir, self.__folder),
+            "language": "Python",
+            "framework": "Flask",
         }
         response = self.client.post(api, json=payload)
         self.assertEqual(200, response.status_code)
