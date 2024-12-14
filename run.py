@@ -1,10 +1,14 @@
 """Main function of the project.
 """
 
-from app import create_app
 from flask_cors import CORS
 
+from app import create_app
+
+
 app = create_app()
+celery_app = app.extensions["celery"]  # -Line 3
+
 # Allow CORS because Electron is running on a different port.
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 

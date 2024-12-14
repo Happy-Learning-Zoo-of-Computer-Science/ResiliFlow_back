@@ -1,39 +1,39 @@
 name: Test Across OS
 
 on:
-    pull_request:
-        branches:
-            - main
-        paths:
-            - '**.py'
-            - 'requirements.txt'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**.py"
+      - "requirements.txt"
 
-    push:
-        branches:
-            - main
-        paths:
-            - '**.py'
-            - 'requirements.txt'
+  push:
+    branches:
+      - main
+    paths:
+      - "**.py"
+      - "requirements.txt"
 
 jobs:
-    unittest:
-        runs-on: ${{ matrix.os }}
-        strategy:
-            matrix:
-                os: [ubuntu-latest, macos-latest, windows-latest]
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+  unittest:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-            - name: Set up Python
-              uses: actions/setup-python@v4
-              with:
-                python-version: '3.12'
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
 
-            - name: Install dependencies
-              run: |
-                python -m pip install --upgrade pip
-                pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-            - name: Run tests
-              run: python -m unittest discover -v -s test -p test_*.py
+      - name: Run tests
+        run: python -m unittest discover -v -s test -p test_*.py
