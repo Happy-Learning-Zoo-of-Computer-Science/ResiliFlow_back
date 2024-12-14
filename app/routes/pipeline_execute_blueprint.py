@@ -34,4 +34,18 @@ def pipeline_blueprint() -> Blueprint:
             200,
         )
 
+    @bp.route("/execute/name/<name>/logs/<id>", methods=["Get"])
+    def get_execution_logs(id: str, name: str) -> tuple[Response, int]:
+        return (
+            jsonify({"log": service.get_execute_logs_by_id(name, id)}),
+            200,
+        )
+
+    @bp.route("/execute/logs", methods=["Get"])
+    def get_execution_logs_name() -> tuple[Response, int]:
+        return (
+            jsonify(service.get_pipeline_execute_logs_name()),
+            200,
+        )
+
     return bp
