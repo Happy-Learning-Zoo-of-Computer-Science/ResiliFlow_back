@@ -167,6 +167,8 @@ class TestFlaskConfigurator(unittest.TestCase):
             os.path.isfile(os.path.join(self.__folder, ".gitignore"))
         )
         self.assertTrue(os.path.isfile(os.path.join(self.__folder, ".env")))
+        for folder in os.walk(self.__folder):
+            print("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=", folder)
         self.assertTrue(os.path.isfile(os.path.join(self.__folder, "run.py")))
         self.assertTrue(
             os.path.isdir(os.path.join(self.__folder, "app", "routes"))
