@@ -5,7 +5,10 @@ import shutil
 import unittest
 
 from app.services.configurators.factory import ConfiguratorFactory
-from app.services.configurators.python_configurator import PythonConfigurator
+from app.services.configurators.python_configurator import (
+    PythonConfigurator,
+    FlaskConfigurator,
+)
 
 
 class MyTestCase(unittest.TestCase):
@@ -29,7 +32,7 @@ class MyTestCase(unittest.TestCase):
         self.assertIsInstance(configurator, PythonConfigurator)
 
         # Framework not supported.
-        self.__attributes["framework"] = "Flask"
+        self.__attributes["framework"] = "Django"
         with self.assertRaises(ValueError):
             ConfiguratorFactory.get_configurator(self.__attributes)
 
@@ -50,7 +53,8 @@ class MyTestCase(unittest.TestCase):
         """Test"""
 
         self.assertEqual(
-            tuple(), ConfiguratorFactory.get_supported_frameworks("Python")
+            tuple(["Flask"]),
+            ConfiguratorFactory.get_supported_frameworks("Python"),
         )
         self.assertEqual(
             tuple(), ConfiguratorFactory.get_supported_frameworks("JavaScript")
@@ -64,7 +68,8 @@ class MyTestCase(unittest.TestCase):
             ConfiguratorFactory.get_configurations("Python"),
         )
         self.assertEqual(
-            {}, ConfiguratorFactory.get_configurations("Python", "Flask")
+            FlaskConfigurator.get_configurations(),
+            ConfiguratorFactory.get_configurations("Python", "Flask"),
         )
 
     def test_get_initialized_configurations(self) -> None:

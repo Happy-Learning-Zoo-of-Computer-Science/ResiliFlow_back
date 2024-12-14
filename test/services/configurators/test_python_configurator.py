@@ -35,7 +35,7 @@ class TestPythonConfigurator(unittest.TestCase):
         """Test"""
 
         self.assertEqual(
-            {".gitignore": None}, PythonConfigurator.get_configurations()
+            {".gitignore": None, ".env": None}, PythonConfigurator.get_configurations()
         )
 
     def test_get_initialized_configurations(self) -> None:
