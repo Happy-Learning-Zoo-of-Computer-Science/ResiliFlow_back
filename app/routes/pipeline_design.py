@@ -1,5 +1,5 @@
+import logging
 from flask import Blueprint, jsonify, request, Response
-
 from app.services.nodeData import deserialize, compile
 
 bp = Blueprint("pipeline_design", __name__, url_prefix="/api/pipeline")
@@ -7,7 +7,16 @@ bp = Blueprint("pipeline_design", __name__, url_prefix="/api/pipeline")
 
 @bp.route("/compile", methods=["GET"])
 def get_supported_languages() -> Response:
-    nodes=deserialize()
-    file_path=compile(nodes)
+    payload = request.get_json()
+    if "input" not in payload:
+        error = 'Missing field "language".'
+        logging.error(error)
+        return jsonify({"error": error}), 400
+    if "output" not in payload:
+        error = 'Missing field "path".'
+        logging.error(error)
+        return jsonify({"error": error}), 400
+    nodes = deserialize(payload["input"])
+    file_path = compile(payload["output"], nodes)
 
     return jsonify(file_path)

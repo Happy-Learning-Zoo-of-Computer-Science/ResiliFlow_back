@@ -5,10 +5,9 @@ import yaml
 import os
 from app.services.pipelineDesign import Node,Position
 
-file_path = "/Users/hsiangjou/Desktop/PBL G5/project/Data/pipeline.yaml"
 
-def deserialize():
-      file_path = "./Data/pipeline.yaml"
+def deserialize(input:str):
+      file_path = input
 
       if not os.path.exists(file_path):
             raise FileNotFoundError(f"{file_path} do not exist")
@@ -37,9 +36,11 @@ for node in nodes:
      print(repr(node))"""
 
 #serialize the deserialed yaml file which pass from frontend into github action yaml format
-def compile(nodes):
-    folder = "./githubAction"
-    os.makedirs(folder, exist_ok=True)
+def compile(output: str, nodes):
+    if not os.path.exists(output):
+        folder = os.path.dirname(output)
+        if folder:  
+            os.makedirs(folder, exist_ok=True)
 
     github_action = {
         'name': 'Python application',  
@@ -69,9 +70,9 @@ def compile(nodes):
     }
 
     github_action.update(job_part)
-    file_path = os.path.join(folder, "GAFormat.yaml")
+    output = os.path.join(folder, "GAFormat.yaml")
 
-    with open(file_path, "w") as file:
+    with open(output, "w") as file:
         yaml.dump(github_action, file, default_flow_style=False)
 
-    return folder
+    return output
