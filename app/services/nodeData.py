@@ -70,7 +70,6 @@ def compile(output: str, nodes):
     }
 
     github_action.update(job_part)
-    output = os.path.join(folder, "GAFormat.yaml")
 
     with open(output, "w") as file:
         yaml.dump(github_action, file, default_flow_style=False)

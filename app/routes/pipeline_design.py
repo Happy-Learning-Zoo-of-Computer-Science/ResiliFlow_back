@@ -7,7 +7,8 @@ bp = Blueprint("pipeline_design", __name__, url_prefix="/api/pipeline")
 
 @bp.route("/compile", methods=["GET"])
 def get_supported_languages() -> Response:
-    payload = request.get_json()
+    payload = request.args
+    print(payload["input"], payload["output"])
     if "input" not in payload:
         error = 'Missing field "language".'
         logging.error(error)
