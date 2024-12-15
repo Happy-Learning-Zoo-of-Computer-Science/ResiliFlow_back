@@ -7,13 +7,14 @@ import logging
 from app.services.configurators.configurator import Configurator
 from app.services.configurators.python_configurator import (
     PythonConfigurator,
+    FlaskConfigurator,
 )
 
 
 class ConfiguratorFactory:
     """Factory that creates Configurator based on attributes."""
 
-    __CONFIGURATOR = {"Python": PythonConfigurator}
+    __CONFIGURATOR = {"Python": PythonConfigurator, "Python@Flask": FlaskConfigurator}
 
     @classmethod
     def get_configurator(cls, attributes: dict[str, any]) -> Configurator:

@@ -58,6 +58,7 @@ class Configurator(ABC):
         """
         configurations = {
             ".gitignore": None,
+            ".env": None,
         }
         return configurations
 
@@ -111,6 +112,14 @@ class Configurator(ABC):
             os.path.join(self._path, ".gitignore"), "w", encoding="utf-8"
         ) as file:
             file.write(self._get_general_gitignore())
+
+    def _build_env(self) -> None:
+        """Create a .env file under project folder."""
+
+        with open(
+            os.path.join(self._path, ".env"), "w", encoding="utf-8"
+        ) as file:
+            file.write("")
 
     @abstractmethod
     def build_configurations(self) -> None:
