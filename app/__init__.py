@@ -4,6 +4,7 @@
 from flask import Flask
 
 from app.routes import project_serialization
+from app.routes import pipeline_design
 
 
 def create_app() -> Flask:
@@ -15,5 +16,6 @@ def create_app() -> Flask:
 
     app = Flask(__name__)
     app.register_blueprint(project_serialization.bp)
+    app.register_blueprint(pipeline_design.bp)
 
     return app
