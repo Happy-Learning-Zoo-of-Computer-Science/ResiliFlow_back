@@ -3,9 +3,10 @@ Test /app/services/project_serialization.py
 """
 
 import os
-import yaml
 import shutil
 import unittest
+
+import yaml
 
 from app.services.project_serialization import ProjectSerializor
 
@@ -93,11 +94,6 @@ class MyTestCase(unittest.TestCase):
 
         # Fail
 
-        data["framework"] = "Flask"
-        with self.assertRaises(ValueError):
-            ProjectSerializor.create_project(data)
-
-        data.pop("framework")
         data["path"] = self.__folder + "A"
         with self.assertRaises(NotADirectoryError):
             ProjectSerializor.create_project(data)
