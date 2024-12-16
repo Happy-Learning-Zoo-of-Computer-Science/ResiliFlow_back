@@ -14,6 +14,8 @@ def deserialize(input: str):
 
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
+        if not data:
+            return []
 
     nodes = []
 
