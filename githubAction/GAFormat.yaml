@@ -1,0 +1,21 @@
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: setup_node
+      run: echo "setup_environment"
+    - name: install_node
+      run: echo "install_dependencies"
+    - name: pytest_node
+      run: echo "pyTest"
+name: Python application
+'on':
+  pull_request:
+    branches:
+    - ''
+  push:
+    branches:
+    - ''
+permissions:
+  contents: read
